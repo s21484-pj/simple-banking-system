@@ -1,28 +1,38 @@
-package banking;
+package banking.model;
 
 import java.util.ArrayList;
 import java.util.Random;
 
 public class Card {
-    private Long id;
+    private int id;
+    private String number;
     private String pin;
-    private double balance;
+    private int balance;
 
     public Card() {
     }
 
-    public Card(Long id, String pin, double balance) {
+    public Card(int id, String number, String pin, int balance) {
         this.id = id;
+        this.number = number;
         this.pin = pin;
         this.balance = balance;
     }
 
-    public Long getId() {
+    public int getId() {
         return id;
     }
 
-    public void setId(Long id) {
+    public void setId(int id) {
         this.id = id;
+    }
+
+    public String getNumber() {
+        return number;
+    }
+
+    public void setNumber(String number) {
+        this.number = number;
     }
 
     public String getPin() {
@@ -33,11 +43,11 @@ public class Card {
         this.pin = pin;
     }
 
-    public double getBalance() {
+    public int getBalance() {
         return balance;
     }
 
-    public void setBalance(double balance) {
+    public void setBalance(int balance) {
         this.balance = balance;
     }
 
@@ -68,7 +78,7 @@ public class Card {
         return checksum;
     }
 
-    public void generateId() {
+    public void generateNumber() {
         final String BIN = "400000";
         Random random = new Random();
         StringBuilder stringBuilder = new StringBuilder();
@@ -76,11 +86,10 @@ public class Card {
             int temp = random.nextInt(10);
             stringBuilder.append(temp);
         }
-        String idAsString = BIN + stringBuilder;
-        int checksum = luhnAlgorithm(idAsString);
-        idAsString = idAsString.concat(String.valueOf(checksum));
-        Long id = Long.parseLong(idAsString);
-        this.setId(id);
+        String numberAsString = BIN + stringBuilder;
+        int checksum = luhnAlgorithm(numberAsString);
+        numberAsString = numberAsString.concat(String.valueOf(checksum));
+        this.setNumber(numberAsString);
     }
 
     public void generatePin() {
