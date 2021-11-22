@@ -51,11 +51,11 @@ public class Card {
         this.balance = balance;
     }
 
-    private int luhnAlgorithm(String id) {
+    private int luhnAlgorithm(String number) {
         ArrayList<Integer> digits = new ArrayList<>();
         int sum = 0;
-        for (int i = 0; i < id.length(); i++) {
-            digits.add(Integer.parseInt(String.valueOf(id.charAt(i))));
+        for (int i = 0; i < number.length(); i++) {
+            digits.add(Integer.parseInt(String.valueOf(number.charAt(i))));
             if (i % 2 == 0) {
                 int temp = digits.get(i) * 2;
                 digits.set(i, temp);
@@ -76,6 +76,25 @@ public class Card {
             }
         }
         return checksum;
+    }
+
+    public boolean isLuhn(String number) {
+        ArrayList<Integer> digits = new ArrayList<>();
+        int sum = 0;
+        for (int i = 0; i < number.length(); i++) {
+            digits.add(Integer.parseInt(String.valueOf(number.charAt(i))));
+            if (i % 2 == 0) {
+                int temp = digits.get(i) * 2;
+                digits.set(i, temp);
+            }
+            if (digits.get(i) > 9) {
+                digits.set(i, digits.get(i) - 9);
+            }
+        }
+        for (Integer digit : digits) {
+            sum += digit;
+        }
+        return sum % 10 == 0;
     }
 
     public void generateNumber() {

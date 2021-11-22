@@ -62,6 +62,12 @@ public class SimpleBankingSystemRepository {
             statement.setString(2, pin);
             statement.setInt(3, balance);
             statement.executeUpdate();
+
+            System.out.println("\nYour card has been created");
+            System.out.println("Your card number:");
+            System.out.println(number);
+            System.out.println("Your card PIN:");
+            System.out.println(pin);
         } catch (SQLException e) {
             System.out.println(e.getMessage());
         }
@@ -73,7 +79,7 @@ public class SimpleBankingSystemRepository {
         Card card = null;
 
         try (Connection conn = this.connect();
-             PreparedStatement statement = conn.prepareStatement(sql)){
+             PreparedStatement statement = conn.prepareStatement(sql)) {
             statement.setString(1, number);
             statement.setString(2, pin);
             ResultSet resultSet = statement.executeQuery();
@@ -86,5 +92,75 @@ public class SimpleBankingSystemRepository {
             System.out.println(e.getMessage());
         }
         return card;
+    }
+
+    public Card getCardByNumber(String number) {
+        String sql = "SELECT id, number, pin, balance "
+                + "FROM card WHERE number = ?";
+        Card card = null;
+
+        try (Connection conn = this.connect();
+             PreparedStatement statement = conn.prepareStatement(sql)) {
+            statement.setString(1, number);
+            ResultSet resultSet = statement.executeQuery();
+            if (resultSet.next()) {
+                int id = resultSet.getInt(1);
+                String pin = resultSet.getString(3);
+                int balance = resultSet.getInt(4);
+                card = new Card(id, number, pin, balance);
+            }
+        } catch (SQLException e) {
+            System.out.println(e.getMessage());
+        }
+        return card;
+    }
+
+    public void addIncome(Card card, int income) {
+        String sql = "UPDATE card SET balance = ? WHERE id = ?";
+
+        try (Connection con = this.connect();
+             PreparedStatement statement = con.prepareStatement(sql)) {
+            statement.setInt(1, card.getBalance() + income);
+            statement.setInt(2, card.getId());
+            statement.executeUpdate();
+            System.out.println("Income was added!");
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void closeAccount(Card card) {
+        String sql = "DELETE FROM card WHERE id = ?";
+
+        try (Connection con = this.connect();
+             PreparedStatement statement = con.prepareStatement(sql)) {
+            statement.setInt(1, card.getId());
+            statement.executeUpdate();
+            System.out.println("\nThe account has been closed!");
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void doTransfer(Card card, Card targetCard, int amount) {
+        String sql = "UPDATE card SET balance = ? WHERE id = ?";
+
+        try (Connection con = this.connect();
+             PreparedStatement statement1 = con.prepareStatement(sql);
+             PreparedStatement statement2 = con.prepareStatement(sql)) {
+            con.setAutoCommit(false);
+
+            statement1.setInt(1, card.getBalance() - amount);
+            statement1.setInt(2, card.getId());
+            statement1.executeUpdate();
+
+            statement2.setInt(1, targetCard.getBalance() + amount);
+            statement2.setInt(2, targetCard.getId());
+            statement2.executeUpdate();
+            con.commit();
+            System.out.println("Success!");
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
     }
 }
